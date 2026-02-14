@@ -30,12 +30,12 @@ jobs:
           docker build \
             --build-arg DATABASE_URL="${{ secrets.DATABASE_URL }}" \
             -f Dockerfile \
-            -t ghcr.io/${{ github.repository }}:latest \
-            -t ghcr.io/${{ github.repository }}:${{ github.sha }} \
+            -t ghcr.io/irian32:latest \
+            -t ghcr.io/irian32:${{ github.sha }} \
             .
 
       - name: Push the Docker image
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: |
-          docker push ghcr.io/${{ github.repository }}:latest
-          docker push ghcr.io/${{ github.repository }}:${{ github.sha }}
+          docker push ghcr.io/irian32:latest
+          docker push ghcr.io/irian32:${{ github.sha }}
