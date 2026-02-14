@@ -18,7 +18,7 @@ ENV NEXTAUTH_URL="http://localhost:3000"
 
 ENV NEXT_TELEMETRY_DISABLED=1
 
-#RUN npx prisma generate
+RUN npx prisma generate
 RUN npm run build
 
 # ---- run ----
@@ -28,6 +28,7 @@ ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 
 # Next standalone output (voir next.config)
+COPY --from=build /app/prisma ./prisma
 COPY --from=build /app/.next/standalone ./
 COPY --from=build /app/.next/static ./.next/static
 COPY --from=build /app/public ./public
