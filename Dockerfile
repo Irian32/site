@@ -15,6 +15,8 @@ COPY . .
 ENV DATABASE_URL="postgresql://user:pass@localhost:5432/db"
 ENV NEXTAUTH_SECRET="dummy-secret-for-build"
 ENV NEXTAUTH_URL="http://localhost:3000"
+ENV DATABASE_URL="postgresql://user:pass@localhost:5432/db"
+
 
 ENV NEXT_TELEMETRY_DISABLED=1
 
