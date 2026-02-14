@@ -15,12 +15,12 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag sayilmuran-website:$(date +%s)
+      run: docker build --build-arg DATABASE_URL="$DATABASE_URL" . --file Dockerfile --tag sayilmuran-website:$(date +%s)
       env:
         DATABASE_URL : ${{ secrets.DATABASE_URL }}
         NEXTAUTH_URL : ${{ secrets.NEXTAUTH_URL }}
         NEXTAUTH_SECRET : ${{ secrets.NEXTAUTH_SECRET }}
         POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
-        POSTGRES_USER: ${{ secrets.OSTGRES_USE }}
+        POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
         POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
 
