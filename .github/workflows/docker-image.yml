@@ -6,19 +6,36 @@ on:
   pull_request:
     branches: [ "main" ]
 
+permissions:
+  contents: read
+  packages: write
+
 jobs:
-
   build:
-
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
-    - name: Build the Docker image
-      run: docker build --build-arg DATABASE_URL="${{ secrets.DATABASE_URL }}" . --file Dockerfile --tag sayilmuran-website:$(date +%s)
-      env:
-        NEXTAUTH_URL : ${{ secrets.NEXTAUTH_URL }}
-        NEXTAUTH_SECRET : ${{ secrets.NEXTAUTH_SECRET }}
-        POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
-        POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
-        POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+      - uses: actions/checkout@v4
+
+      - name: Log in to GHCR
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build the Docker image
+        run: |
+          docker build \
+            --build-arg DATABASE_URL="${{ secrets.DATABASE_URL }}" \
+            -f Dockerfile \
+            -t ghcr.io/${{ github.repository }}:latest \
+            -t ghcr.io/${{ github.repository }}:${{ github.sha }} \
+            .
+
+      - name: Push the Docker image
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: |
+          docker push ghcr.io/${{ github.repository }}:latest
+          docker push ghcr.io/${{ github.repository }}:${{ github.sha }}
