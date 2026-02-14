@@ -12,10 +12,6 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 ENV NEXT_TELEMETRY_DISABLED=1
 
-# juste pour que next build arrête de pleurer
-ENV NEXTAUTH_URL=http://localhost:3000
-ENV NEXTAUTH_SECRET=build-time-dummy-secret
-
 RUN npx prisma generate
 RUN npm run build
 
