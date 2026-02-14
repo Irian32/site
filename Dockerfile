@@ -16,6 +16,7 @@ ENV NEXT_TELEMETRY_DISABLED=1
 ENV NEXTAUTH_URL=http://localhost:3000
 ENV NEXTAUTH_SECRET=build-time-dummy-secret
 
+RUN npx prisma generate
 RUN npm run build
 
 # ---- run ----
