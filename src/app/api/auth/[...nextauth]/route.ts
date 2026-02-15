@@ -1,7 +1,8 @@
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import bcrypt from "bcrypt";
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "@/lib/prisma"; // <-- singleton
+// (si tu veux garder PrismaClient inline, ok, mais voilà la version propre)
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -20,9 +21,6 @@ const authHandler = NextAuth({
         const password = credentials?.password ?? "";
         if (!email || !password) return null;
 
-        // IMPORTANT: Prisma instancié ici (pas au top-level) pour éviter de casser le build si DATABASE_URL manque
-        const prisma = new PrismaClient();
-
         const user = await prisma.user.findUnique({ where: { email } });
         if (!user) return null;
 
@@ -33,6 +31,24 @@ const authHandler = NextAuth({
       },
     }),
   ],
+  callbacks: {
+    async jwt({ token, user }) {
+      // user existe seulement au moment du signIn
+      if (user) {
+        token.sub = user.id; // standard
+        token.name = user.name;
+        token.email = user.email;
+      }
+      return token;
+    },
+    async session({ session, token }) {
+      // Ajoute l'id à la session côté client
+      if (session.user) {
+        (session.user as any).id = token.sub;
+      }
+      return session;
+    },
+  },
 });
 
 export { authHandler as GET, authHandler as POST };

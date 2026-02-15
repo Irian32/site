@@ -19,6 +19,22 @@
   }
 }
 
+@layer components {
+  .input-underline {
+    @apply w-full bg-transparent text-white
+           placeholder-white/60
+           border-b border-white/80
+           py-3
+           focus:outline-none focus:border-orange-500
+           transition;
+  }
+}
+
+.btn-secondary {
+  @apply w-full py-3 rounded-full border border-orange-500
+         text-orange-400 hover:bg-orange-500 hover:text-black transition;
+}
+
 body {
   background: var(--background);
   color: var(--foreground);

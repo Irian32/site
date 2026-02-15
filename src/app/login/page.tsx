@@ -1,42 +1,68 @@
 "use client";
 
 import { useState } from "react";
+import { signIn } from "next-auth/react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
+  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
+    setError(null);
+    setLoading(true);
 
-    console.log("Login attempt:", { email, password });
+    const res = await signIn("credentials", {
+      email,
+      password,
+      redirect: false, // important: on gère nous-mêmes la navigation
+    });
 
-    // Plus tard → appel API ici
-  };
+    setLoading(false);
+
+    if (!res || res.error) {
+      setError("Invalid email or password");
+      return;
+    }
+
+    router.push("/"); // ou /dashboard
+  }
 
   return (
-    <main style={{ padding: "2rem", fontFamily: "sans-serif" }}>
-      <h1>Connexion</h1>
-
-      <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "1rem", maxWidth: 400 }}>
+    <div className="min-h-screen bg-black flex items-center justify-center px-6">
+      <form onSubmit={onSubmit} className="w-full max-w-sm space-y-8">
         <input
-          type="email"
-          placeholder="Email"
+          className="input-underline"
+          placeholder="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          required
         />
 
         <input
+          className="input-underline"
           type="password"
-          placeholder="Mot de passe"
+          placeholder="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          required
         />
 
-        <button type="submit">Se connecter</button>
+        {error && <p className="text-red-400 text-sm">{error}</p>}
+
+        <div className="flex flex-col space-y-3 pt-6">
+          <button className="btn-primary" disabled={loading}>
+            {loading ? "Checking..." : "Login"}
+          </button>
+
+          <Link href="/register" className="btn-secondary text-center block">
+            Register
+          </Link>
+        </div>
       </form>
-    </main>
+    </div>
   );
 }
